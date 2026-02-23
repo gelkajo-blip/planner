@@ -1,0 +1,1315 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>2026 혜정님 연간 플래너 v5</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+KR:wght@400;700&family=Noto+Sans+KR:wght@300;400;500;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --cream:#faf6f0; --white:#fff9f2; --brown:#4a3020; --brown2:#7a5c44; --brown3:#b8977e;
+  --border:#e6d8c8; --ink:#2a1f1a; --ink2:#6b5040;
+  --edit-bg:#fff8e6; --edit-border:#f0c040;
+  --radius:14px; --shadow:0 2px 12px rgba(74,48,32,0.08);
+}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+body{font-family:'Noto Sans KR',sans-serif;background:var(--cream);color:var(--ink);min-height:100vh}
+
+/* NAV */
+.nav-wrap{position:sticky;top:0;z-index:100;background:var(--brown)}
+.header-bar{padding:1rem 1.2rem 0.5rem;display:flex;align-items:center;justify-content:space-between;gap:0.5rem}
+.header-bar-center{text-align:center;flex:1}
+.header-bar-center h1{font-family:'Noto Serif KR',serif;color:#fff;font-size:1.1rem;font-weight:700}
+.header-bar-center p{color:rgba(255,255,255,0.5);font-size:0.62rem;margin-top:0.1rem}
+.hdr-btns{display:flex;gap:0.4rem;flex-shrink:0}
+.hdr-btn{display:flex;align-items:center;gap:0.25rem;padding:0.38rem 0.65rem;border-radius:99px;border:1.5px solid rgba(255,255,255,0.3);background:none;color:rgba(255,255,255,0.8);font-size:0.68rem;cursor:pointer;font-family:'Noto Sans KR',sans-serif;transition:all 0.2s;white-space:nowrap}
+.hdr-btn.on{background:var(--edit-border);border-color:var(--edit-border);color:var(--brown);font-weight:700}
+.hdr-btn.save-btn{border-color:rgba(255,255,255,0.5)}
+.hdr-btn.save-btn:hover{background:rgba(255,255,255,0.15)}
+.tabs{display:flex;overflow-x:auto;scrollbar-width:none;border-top:1px solid rgba(255,255,255,0.12)}
+.tabs::-webkit-scrollbar{display:none}
+.tab-btn{flex-shrink:0;padding:0.6rem 1rem;font-size:0.75rem;color:rgba(255,255,255,0.55);background:none;border:none;cursor:pointer;white-space:nowrap;border-bottom:3px solid transparent;transition:all 0.2s;font-family:'Noto Sans KR',sans-serif}
+.tab-btn.active{color:#fff;border-bottom-color:#fff}
+
+/* BANNERS */
+.edit-banner{display:none;background:var(--edit-bg);border-bottom:2px solid var(--edit-border);padding:0.5rem 1rem;font-size:0.7rem;color:#8a6000;text-align:center}
+.edit-banner.show{display:block}
+.save-banner{display:none;background:#e8f5e9;border-bottom:2px solid #66bb6a;padding:0.5rem 1rem;font-size:0.7rem;color:#2e7d32;text-align:center;align-items:center;justify-content:space-between;gap:0.5rem}
+.save-banner.show{display:flex}
+.save-now-btn{background:#66bb6a;color:#fff;border:none;border-radius:99px;padding:0.3rem 0.8rem;font-size:0.7rem;cursor:pointer;font-family:'Noto Sans KR',sans-serif;white-space:nowrap}
+
+/* PROGRESS */
+.total-progress{background:var(--white);border-bottom:1px solid var(--border);padding:0.8rem 1.2rem;display:flex;align-items:center;gap:0.9rem}
+.tp-label{font-size:0.7rem;color:var(--brown2);font-weight:500;white-space:nowrap}
+.tp-bar{flex:1;height:7px;background:var(--border);border-radius:99px;overflow:hidden}
+.tp-fill{height:100%;background:linear-gradient(90deg,#5a9467,#c9a227);border-radius:99px;transition:width 0.4s;width:0%}
+.tp-count{font-size:0.72rem;color:var(--brown2);white-space:nowrap}
+
+/* PAGES */
+.page{display:none;padding:1rem;max-width:900px;margin:0 auto}
+.page.active{display:block}
+
+/* QUARTER LABEL */
+.quarter-label{font-family:'Noto Serif KR',serif;font-size:0.72rem;letter-spacing:0.18em;color:var(--brown3);margin:1.4rem 0 0.6rem;font-weight:700;display:flex;align-items:center;gap:0.5rem}
+.quarter-label::after{content:'';flex:1;height:1px;background:var(--border)}
+.months-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(270px,1fr));gap:0.8rem}
+
+/* MONTH CARD */
+.month-card{background:var(--white);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;box-shadow:var(--shadow);transition:border-color 0.2s}
+.edit-mode .month-card{border-color:var(--edit-border)}
+.month-head{padding:0.85rem 1rem 0.7rem;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--border)}
+.month-head-left{display:flex;align-items:center;gap:0.6rem}
+.month-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0}
+.month-info h3{font-family:'Noto Serif KR',serif;font-size:1rem;font-weight:700;color:var(--brown)}
+.month-info p{font-size:0.65rem;color:var(--brown3);margin-top:0.1rem}
+.ring-wrap{position:relative;width:36px;height:36px;flex-shrink:0}
+.ring-wrap svg{transform:rotate(-90deg)}
+.ring-bg{fill:none;stroke:var(--border);stroke-width:3}
+.ring-fill{fill:none;stroke-width:3;stroke-linecap:round;transition:stroke-dashoffset 0.4s}
+.ring-label{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:0.58rem;font-weight:700;color:var(--brown2)}
+.month-tasks{padding:0.7rem 1rem 0.9rem;display:flex;flex-direction:column;gap:0.25rem}
+
+/* TASK ROW */
+.task-row{display:flex;align-items:flex-start;gap:0.5rem;padding:0.35rem 0.4rem;border-radius:7px;transition:background 0.15s}
+.task-row:not(.edit-mode-row){cursor:pointer}
+.task-row.done{opacity:0.45}
+.task-row.done .task-label{text-decoration:line-through}
+.task-cb{appearance:none;-webkit-appearance:none;width:16px;height:16px;border:1.5px solid var(--brown3);border-radius:4px;flex-shrink:0;margin-top:1px;cursor:pointer;transition:all 0.2s;position:relative}
+.task-cb:checked{border-color:#5a9467;background:#5a9467}
+.task-cb:checked::after{content:'✓';position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:10px;color:#fff;line-height:14px;text-align:center}
+.tag-dot{width:7px;height:7px;border-radius:50%;flex-shrink:0;margin-top:5px}
+.task-label{font-size:0.75rem;line-height:1.55;color:var(--ink2);flex:1}
+
+/* EDIT INPUTS */
+.edit-inline{flex:1;border:1.5px solid var(--edit-border);border-radius:6px;padding:0.25rem 0.5rem;font-size:0.75rem;font-family:'Noto Sans KR',sans-serif;color:var(--ink);background:var(--edit-bg);outline:none}
+.edit-inline-theme{width:100%;border:1.5px solid var(--edit-border);border-radius:6px;padding:0.2rem 0.4rem;font-size:0.63rem;font-family:'Noto Sans KR',sans-serif;color:var(--brown2);background:var(--edit-bg);outline:none;margin-top:0.15rem}
+.edit-inline-desc{width:100%;border:1.5px solid var(--edit-border);border-radius:8px;padding:0.45rem 0.7rem;font-size:0.75rem;font-family:'Noto Sans KR',sans-serif;color:var(--ink);background:var(--edit-bg);outline:none;resize:none;margin-top:0.3rem}
+.goal-label-edit{flex:1;border:1.5px solid var(--edit-border);border-radius:5px;padding:0.15rem 0.4rem;font-size:0.72rem;font-family:'Noto Sans KR',sans-serif;background:var(--edit-bg);outline:none}
+.weekly-day-edit{flex:1;border:1.5px solid var(--edit-border);border-radius:5px;padding:0.15rem 0.4rem;font-size:0.7rem;font-family:'Noto Sans KR',sans-serif;background:var(--edit-bg);outline:none;font-weight:700;color:var(--brown2)}
+.del-btn{background:none;border:none;color:#d0a0a0;font-size:1rem;cursor:pointer;padding:0 0.15rem;line-height:1;flex-shrink:0;margin-top:1px;transition:color 0.15s}
+.del-btn:hover{color:#c0504f}
+
+/* ADD ROW */
+.add-task-row{display:flex;align-items:center;gap:0.4rem;padding:0.3rem 0.4rem 0;border-top:1px dashed var(--border);margin-top:0.3rem}
+.add-task-input{flex:1;border:none;background:none;font-size:0.72rem;color:var(--ink);font-family:'Noto Sans KR',sans-serif;outline:none;padding:0.25rem 0}
+.add-task-input::placeholder{color:var(--brown3)}
+.add-task-btn{background:none;border:none;font-size:1.1rem;color:var(--brown3);cursor:pointer;padding:0 0.2rem;line-height:1}
+
+/* PROJ SELECTOR */
+.proj-selector{display:flex;gap:0.5rem;flex-wrap:wrap;margin-bottom:1rem}
+.proj-pill{padding:0.4rem 0.85rem;border-radius:99px;font-size:0.72rem;border:1.5px solid var(--border);background:var(--white);cursor:pointer;transition:all 0.2s;font-family:'Noto Sans KR',sans-serif;color:var(--ink2)}
+
+/* TRACKER */
+.proj-tracker{display:none}
+.proj-tracker.active{display:block}
+.tracker-header{background:var(--white);border:1px solid var(--border);border-radius:var(--radius);padding:1.1rem 1.2rem;margin-bottom:1rem;box-shadow:var(--shadow)}
+.tracker-header h2{font-family:'Noto Serif KR',serif;font-size:1.15rem;font-weight:700;margin-bottom:0.25rem}
+.tracker-header p{font-size:0.75rem;color:var(--ink2);line-height:1.6}
+.goal-vs-section{background:var(--white);border:1px solid var(--border);border-radius:var(--radius);padding:1rem 1.2rem;margin-bottom:1rem;box-shadow:var(--shadow)}
+.section-title{font-size:0.72rem;font-weight:700;letter-spacing:0.12em;color:var(--brown3);margin-bottom:0.8rem;text-transform:uppercase}
+.goal-rows{display:flex;flex-direction:column;gap:0.6rem}
+.goal-row{display:grid;grid-template-columns:1fr 1fr;gap:0.5rem;align-items:start}
+.goal-row-label{font-size:0.72rem;color:var(--ink2);grid-column:1/-1;font-weight:500;display:flex;align-items:center;gap:0.4rem}
+.goal-label-text{flex:1}
+.goal-input-wrap{display:flex;flex-direction:column;gap:0.15rem}
+.goal-input-wrap span{font-size:0.62rem;color:var(--brown3)}
+.goal-input{width:100%;border:1.5px solid var(--border);border-radius:8px;padding:0.45rem 0.7rem;font-size:0.78rem;font-family:'Noto Sans KR',sans-serif;color:var(--ink);background:var(--cream);outline:none;transition:border-color 0.2s}
+.goal-input:focus{border-color:var(--brown3);background:#fff}
+.goal-compare-bar{grid-column:1/-1}
+.compare-labels{display:flex;justify-content:space-between;font-size:0.62rem;color:var(--brown3);margin-bottom:0.3rem}
+.compare-track{height:6px;background:var(--border);border-radius:99px;position:relative;overflow:hidden;margin-bottom:0.2rem}
+.compare-actual-bar{height:100%;border-radius:99px;position:absolute;top:0;left:0;transition:width 0.4s}
+.add-goal-btn{margin-top:0.7rem;width:100%;padding:0.5rem;border:1.5px dashed var(--border);border-radius:8px;background:none;font-size:0.72rem;color:var(--brown3);cursor:pointer;font-family:'Noto Sans KR',sans-serif;transition:all 0.2s}
+.goal-divider{border:none;border-top:1px dashed var(--border);margin:0.4rem 0}
+
+/* MONTHLY DETAIL */
+.monthly-detail-grid{display:flex;flex-direction:column;gap:0.6rem}
+.detail-month-card{background:var(--white);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;box-shadow:var(--shadow)}
+.detail-month-head{padding:0.7rem 1rem;display:flex;align-items:center;justify-content:space-between;cursor:pointer;user-select:none}
+.detail-month-head h4{font-family:'Noto Serif KR',serif;font-size:0.9rem;font-weight:700}
+.detail-month-theme{font-size:0.65rem;color:var(--brown3)}
+.detail-month-pct{font-size:0.72rem;font-weight:700}
+.detail-chevron{font-size:0.7rem;color:var(--brown3);transition:transform 0.25s}
+.detail-month-card.open .detail-chevron{transform:rotate(180deg)}
+.detail-body{display:none;padding:0.5rem 1rem 0.8rem;border-top:1px solid var(--border)}
+.detail-month-card.open .detail-body{display:block}
+.detail-tasks{display:flex;flex-direction:column;gap:0.25rem}
+
+/* WEEKLY */
+.weekly-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:0.7rem}
+.weekly-card{background:var(--white);border:1px solid var(--border);border-radius:var(--radius);padding:0.9rem 1rem;box-shadow:var(--shadow);transition:border-color 0.2s}
+.edit-mode .weekly-card{border-color:var(--edit-border)}
+.weekly-day-name{font-size:0.7rem;font-weight:700;letter-spacing:0.1em;color:var(--brown2);margin-bottom:0.55rem;display:flex;align-items:center;gap:0.4rem}
+.add-weekly-btn{margin-top:0.4rem;width:100%;padding:0.3rem;border:1.5px dashed var(--border);border-radius:6px;background:none;font-size:0.68rem;color:var(--brown3);cursor:pointer;font-family:'Noto Sans KR',sans-serif}
+.postpone-btn{background:none;border:none;font-size:0.68rem;color:var(--brown3);cursor:pointer;padding:0 0.2rem;line-height:1;flex-shrink:0;margin-top:2px;transition:color 0.15s;white-space:nowrap}
+.postpone-btn:hover{color:#c9a227}
+.postpone-bar{display:flex;align-items:center;justify-content:space-between;padding:0.35rem 0.6rem;border-top:1px dashed var(--border);margin-top:0.3rem}
+.postpone-bar-label{font-size:0.62rem;color:var(--brown3)}
+.postpone-all-btn{padding:0.25rem 0.7rem;border:1.5px solid #c9a227;border-radius:99px;background:none;font-size:0.65rem;color:#c9a227;cursor:pointer;font-family:'Noto Sans KR',sans-serif;transition:all 0.2s}
+.postpone-all-btn:hover{background:#c9a227;color:#fff}
+.postponed-badge{font-size:0.6rem;background:#fdf8ea;border:1px solid #c9a227;color:#c9a227;border-radius:99px;padding:0.08rem 0.4rem;margin-left:0.3rem;white-space:nowrap}
+
+/* DAILY ROUTINE */
+.daily-header{background:var(--white);border:1px solid var(--border);border-radius:var(--radius);padding:1rem 1.2rem;margin-bottom:1rem;box-shadow:var(--shadow);display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:0.6rem}
+.daily-header-left h2{font-family:'Noto Serif KR',serif;font-size:1.1rem;font-weight:700;color:var(--brown)}
+.daily-header-left p{font-size:0.7rem;color:var(--brown3);margin-top:0.2rem}
+.daily-date-badge{background:var(--brown);color:#fff;border-radius:var(--radius);padding:0.4rem 0.9rem;font-size:0.72rem;font-weight:700;white-space:nowrap}
+.daily-mood{background:var(--white);border:1px solid var(--border);border-radius:var(--radius);padding:0.85rem 1.2rem;margin-bottom:1rem;box-shadow:var(--shadow)}
+.daily-mood-title{font-size:0.7rem;font-weight:700;letter-spacing:0.1em;color:var(--brown3);margin-bottom:0.6rem}
+.mood-btns{display:flex;gap:0.4rem;flex-wrap:wrap}
+.mood-btn{padding:0.35rem 0.7rem;border-radius:99px;border:1.5px solid var(--border);background:var(--cream);font-size:0.75rem;cursor:pointer;transition:all 0.2s;font-family:'Noto Sans KR',sans-serif}
+.mood-btn.selected{border-color:var(--brown2);background:var(--brown);color:#fff}
+.daily-grid{display:grid;grid-template-columns:1fr 1fr;gap:0.8rem;margin-bottom:1rem}
+@media(max-width:540px){.daily-grid{grid-template-columns:1fr}}
+.daily-block{background:var(--white);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;box-shadow:var(--shadow)}
+.daily-block-head{padding:0.65rem 1rem;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:0.5rem}
+.daily-block-icon{font-size:1rem}
+.daily-block-title{font-size:0.8rem;font-weight:700;color:var(--brown)}
+.daily-block-time{margin-left:auto;font-size:0.62rem;color:var(--brown3);background:var(--cream);padding:0.15rem 0.5rem;border-radius:99px}
+.daily-slots{padding:0.5rem 0.8rem 0.7rem;display:flex;flex-direction:column;gap:0.2rem}
+.daily-slot{display:flex;align-items:center;gap:0.5rem;padding:0.28rem 0.3rem;border-radius:6px}
+.slot-time{font-size:0.62rem;color:var(--brown3);width:38px;flex-shrink:0;font-weight:500}
+.slot-input{flex:1;border:none;background:none;font-size:0.72rem;color:var(--ink);font-family:'Noto Sans KR',sans-serif;outline:none;padding:0.15rem 0;border-bottom:1px dashed transparent;transition:border-color 0.2s}
+.slot-input:focus{border-bottom-color:var(--brown3)}
+.slot-input::placeholder{color:var(--brown3)}
+.slot-cb{appearance:none;-webkit-appearance:none;width:14px;height:14px;border:1.5px solid var(--brown3);border-radius:3px;flex-shrink:0;cursor:pointer;transition:all 0.2s;position:relative}
+.slot-cb:checked{border-color:#5a9467;background:#5a9467}
+.slot-cb:checked::after{content:'✓';position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:9px;color:#fff;line-height:13px;text-align:center}
+.daily-todo{background:var(--white);border:1px solid var(--border);border-radius:var(--radius);margin-bottom:1rem;box-shadow:var(--shadow);overflow:hidden}
+.daily-todo-head{padding:0.65rem 1rem;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between}
+.daily-todo-title{font-size:0.8rem;font-weight:700;color:var(--brown);display:flex;align-items:center;gap:0.4rem}
+.todo-count-badge{background:var(--brown);color:#fff;border-radius:99px;padding:0.1rem 0.5rem;font-size:0.62rem}
+.daily-todo-list{padding:0.5rem 1rem 0.3rem;display:flex;flex-direction:column;gap:0.15rem}
+.daily-todo-add{display:flex;align-items:center;gap:0.4rem;padding:0.4rem 1rem 0.6rem;border-top:1px dashed var(--border);margin-top:0.2rem}
+.daily-todo-input{flex:1;border:none;background:none;font-size:0.72rem;font-family:'Noto Sans KR',sans-serif;outline:none;color:var(--ink)}
+.daily-todo-input::placeholder{color:var(--brown3)}
+.daily-todo-btn{background:none;border:none;font-size:1.1rem;color:var(--brown3);cursor:pointer;padding:0 0.2rem;line-height:1}
+.daily-priority{display:flex;gap:0.3rem;margin-right:0.3rem}
+.pri-dot{width:8px;height:8px;border-radius:50%;border:1.5px solid var(--border);cursor:pointer;flex-shrink:0;margin-top:3px;transition:all 0.15s}
+.pri-dot.high{border-color:#c4714f}.pri-dot.high.on{background:#c4714f}
+.pri-dot.mid{border-color:#c9a227}.pri-dot.mid.on{background:#c9a227}
+.pri-dot.low{border-color:#5a9467}.pri-dot.low.on{background:#5a9467}
+.daily-memo{background:var(--white);border:1px solid var(--border);border-radius:var(--radius);margin-bottom:1rem;box-shadow:var(--shadow);overflow:hidden}
+.daily-memo-head{padding:0.65rem 1rem;border-bottom:1px solid var(--border);font-size:0.8rem;font-weight:700;color:var(--brown)}
+.daily-memo textarea{width:100%;border:none;background:none;font-size:0.75rem;font-family:'Noto Sans KR',sans-serif;color:var(--ink);padding:0.7rem 1rem;resize:none;outline:none;min-height:80px;line-height:1.6}
+.daily-nav{display:flex;align-items:center;justify-content:space-between;margin-bottom:0.8rem}
+.daily-nav-btn{padding:0.4rem 0.9rem;border:1.5px solid var(--border);border-radius:99px;background:var(--white);font-size:0.72rem;cursor:pointer;font-family:'Noto Sans KR',sans-serif;color:var(--brown2);transition:all 0.2s}
+.daily-nav-btn:hover{background:var(--brown);color:#fff;border-color:var(--brown)}
+.daily-nav-date{font-family:'Noto Serif KR',serif;font-size:0.9rem;font-weight:700;color:var(--brown)}
+
+/* FINANCE */
+.fin-summary-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:0.7rem;margin-bottom:1rem}
+.fin-kpi{background:var(--white);border:1px solid var(--border);border-radius:var(--radius);padding:0.85rem 1rem;box-shadow:var(--shadow);text-align:center}
+.fin-kpi-label{font-size:0.62rem;color:var(--brown3);margin-bottom:0.3rem;font-weight:500}
+.fin-kpi-value{font-family:'Noto Serif KR',serif;font-size:1.2rem;font-weight:700;color:var(--brown)}
+.fin-kpi-sub{font-size:0.6rem;color:var(--brown3);margin-top:0.15rem}
+.fin-kpi.good .fin-kpi-value{color:#5a9467}
+.fin-kpi.warn .fin-kpi-value{color:#c9a227}
+.fin-kpi.bad  .fin-kpi-value{color:#c4714f}
+.fin-month-tabs{display:flex;overflow-x:auto;scrollbar-width:none;gap:0.3rem;margin-bottom:1rem;padding-bottom:0.2rem}
+.fin-month-tabs::-webkit-scrollbar{display:none}
+.fin-mtab{flex-shrink:0;padding:0.35rem 0.75rem;border-radius:99px;border:1.5px solid var(--border);background:var(--white);font-size:0.72rem;cursor:pointer;font-family:'Noto Sans KR',sans-serif;color:var(--ink2);transition:all 0.2s}
+.fin-mtab.active{background:var(--brown);color:#fff;border-color:var(--brown)}
+.fin-card{background:var(--white);border:1px solid var(--border);border-radius:var(--radius);margin-bottom:0.8rem;box-shadow:var(--shadow);overflow:hidden}
+.fin-card-head{padding:0.7rem 1rem;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between}
+.fin-card-title{font-size:0.8rem;font-weight:700;color:var(--brown);display:flex;align-items:center;gap:0.4rem}
+.fin-card-total{font-size:0.78rem;font-weight:700;color:var(--brown2)}
+.fin-rows{padding:0.5rem 0.8rem 0.7rem;display:flex;flex-direction:column;gap:0.3rem}
+.fin-row{display:grid;grid-template-columns:1fr 90px 90px 50px;align-items:center;gap:0.4rem;padding:0.3rem 0.3rem;border-radius:6px}
+.fin-row:hover{background:var(--cream)}
+.fin-row-label{font-size:0.72rem;color:var(--ink2)}
+.fin-input{width:100%;border:1.5px solid var(--border);border-radius:6px;padding:0.28rem 0.5rem;font-size:0.72rem;font-family:'Noto Sans KR',sans-serif;color:var(--ink);background:var(--cream);outline:none;text-align:right;transition:border-color 0.2s}
+.fin-input:focus{border-color:var(--brown3);background:#fff}
+.fin-diff{font-size:0.7rem;font-weight:700;text-align:right}
+.fin-diff.plus{color:#5a9467}
+.fin-diff.minus{color:#c4714f}
+.fin-diff.zero{color:var(--brown3)}
+.fin-bar-wrap{height:5px;background:var(--border);border-radius:99px;overflow:hidden;margin-top:0.15rem}
+.fin-bar-fill{height:100%;border-radius:99px;transition:width 0.4s}
+.fin-add-row{display:flex;align-items:center;gap:0.4rem;padding:0.3rem 0.8rem 0.5rem;border-top:1px dashed var(--border)}
+.fin-add-input{flex:1;border:none;background:none;font-size:0.7rem;font-family:'Noto Sans KR',sans-serif;outline:none;color:var(--ink)}
+.fin-add-input::placeholder{color:var(--brown3)}
+.fin-add-btn{background:none;border:none;font-size:1rem;color:var(--brown3);cursor:pointer}
+.fin-tuition-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:0.5rem;padding:0.6rem 0.8rem 0.8rem}
+.fin-student-card{background:var(--cream);border:1px solid var(--border);border-radius:8px;padding:0.5rem 0.6rem}
+.fin-student-name{font-size:0.68rem;font-weight:700;color:var(--brown2);margin-bottom:0.25rem}
+.fin-student-row{display:flex;align-items:center;justify-content:space-between;gap:0.3rem}
+.fin-student-label{font-size:0.6rem;color:var(--brown3)}
+.fin-student-input{width:70px;border:1px solid var(--border);border-radius:5px;padding:0.2rem 0.4rem;font-size:0.68rem;font-family:'Noto Sans KR',sans-serif;text-align:right;background:#fff;outline:none}
+.fin-student-cb{accent-color:#5a9467}
+.fin-add-student{display:flex;gap:0.4rem;padding:0.3rem 0.8rem 0.6rem;border-top:1px dashed var(--border)}
+.fin-section-label{font-size:0.62rem;font-weight:700;letter-spacing:0.1em;color:var(--brown3);padding:0.5rem 1rem 0;text-transform:uppercase}
+.fin-yearly-bar{display:flex;gap:0.15rem;align-items:flex-end;height:60px;padding:0 1rem 0.5rem}
+.fin-y-col{flex:1;display:flex;flex-direction:column;align-items:center;gap:0.15rem;cursor:pointer}
+.fin-y-bar{width:100%;border-radius:3px 3px 0 0;min-height:3px;transition:height 0.4s}
+.fin-y-label{font-size:0.55rem;color:var(--brown3)}
+/* TOAST */
+.toast{position:fixed;bottom:1.5rem;left:50%;transform:translateX(-50%) translateY(20px);background:var(--brown);color:#fff;padding:0.5rem 1.2rem;border-radius:99px;font-size:0.72rem;opacity:0;transition:all 0.3s;pointer-events:none;z-index:999;white-space:nowrap}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+</style>
+</head>
+<body>
+
+<div class="nav-wrap">
+  <div class="header-bar">
+    <div style="width:10px"></div>
+    <div class="header-bar-center">
+      <h1>2026 혜정님 플래너</h1>
+      <p>기탄생각교실 · 5대 프로젝트 · 3단계 마스터플랜</p>
+    </div>
+    <div class="hdr-btns">
+      <button class="hdr-btn" id="editBtn" onclick="toggleEditMode()">✏️ 편집</button>
+      <button class="hdr-btn save-btn" onclick="downloadFile()">💾 저장</button>
+    </div>
+  </div>
+  <div class="tabs">
+    <button class="tab-btn active" onclick="showPage('overview',this)">📅 월별 개요</button>
+    <button class="tab-btn" onclick="showPage('tracker',this)">📊 프로젝트 트래커</button>
+    <button class="tab-btn" onclick="showPage('weekly',this)">🔁 주간 루틴</button>
+    <button class="tab-btn" onclick="showPage('daily',this);buildDaily()">☀️ 하루 루틴</button>
+    <button class="tab-btn" onclick="showPage('finance',this);buildFinance()">💰 재무</button>
+  </div>
+</div>
+
+<div class="edit-banner" id="editBanner">✏️ 편집 모드 — 텍스트를 클릭해 수정, 🗑 버튼으로 삭제 | 완료 후 반드시 💾 저장을 눌러주세요</div>
+<div class="save-banner" id="saveBanner">
+  <span>변경 내용이 있어요. 저장하면 폰에서도 그대로 열려요!</span>
+  <button class="save-now-btn" onclick="downloadFile()">📥 지금 저장하기</button>
+</div>
+
+<div class="total-progress">
+  <span class="tp-label">전체 진행률</span>
+  <div class="tp-bar"><div class="tp-fill" id="totalFill"></div></div>
+  <span class="tp-count" id="totalCount">0 / 0</span>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<div class="page active" id="page-overview"><div id="overviewContent"></div></div>
+<div class="page" id="page-tracker">
+  <div class="proj-selector" id="projSelector"></div>
+  <div id="trackerContent"></div>
+</div>
+<div class="page" id="page-weekly">
+  <div class="quarter-label">매주 반복 루틴</div>
+  <div class="weekly-grid" id="weeklyGrid"></div>
+</div>
+
+<div class="page" id="page-daily">
+  <div id="dailyContent"></div>
+</div>
+<div class="page" id="page-finance">
+  <div id="financeContent"></div>
+</div>
+
+<script id="dataScript">
+// ════════════════════════════════════════════
+// DATA — 이 블록이 파일 저장 시 통째로 교체됩니다
+// ════════════════════════════════════════════
+var SAVE_DATA = {
+  projects: [
+    {id:'p1',name:'시간자산 리셋',icon:'⏰',color:'#c4714f',light:'#fdf0eb',
+      desc:'Notion 기반 하루·주간·계절별 루틴 시스템 구축으로 시간 주도권 확보',
+      goals:[
+        {label:'Notion 루틴 템플릿 완성',unit:'개',target:3,actual:0},
+        {label:'주간 루틴 유지',unit:'주',target:48,actual:0}
+      ]},
+    {id:'p2',name:'재무재정비',icon:'💰',color:'#c9a227',light:'#fdf8ea',
+      desc:'월 예산 관리·저축 자동화·스마트스토어 수입 다각화로 재무 기반 구축',
+      goals:[
+        {label:'스마트스토어 누적 매출',unit:'만원',target:300,actual:0},
+        {label:'Canva 템플릿 출시',unit:'개',target:5,actual:0},
+        {label:'월 저축 목표 달성',unit:'개월',target:10,actual:0}
+      ]},
+    {id:'p3',name:'공부방 성장시스템',icon:'📚',color:'#5a9467',light:'#edf5ef',
+      desc:'[1단계] 20명+시스템장착+브랜딩 → [2단계] 30명+안정수익 → [3단계] 학원형 독립브랜딩',
+      goals:[
+        {label:'수강생 수 (1단계 목표: 20명)',unit:'명',target:20,actual:0},
+        {label:'수강생 수 (2단계 목표: 30명)',unit:'명',target:30,actual:0},
+        {label:'인스타 팔로워',unit:'명',target:500,actual:0},
+        {label:'성장보고서 발송',unit:'회',target:4,actual:0},
+        {label:'학부모 상담 루틴 정착',unit:'개월',target:10,actual:0}
+      ]},
+    {id:'p4',name:'건강/외모 관리',icon:'🌿',color:'#4a7fa8',light:'#eaf2f8',
+      desc:'체중·식단·운동·패션·마인드 관리로 몸과 마음의 에너지 유지',
+      goals:[
+        {label:'운동 목표 달성',unit:'주',target:40,actual:0},
+        {label:'식단 기록 유지',unit:'일',target:200,actual:0}
+      ]},
+    {id:'p5',name:'자기 리더십 향상',icon:'✨',color:'#8b5e83',light:'#f5eef5',
+      desc:'감정관리·의사결정·삶의 방향성 점검으로 내면 성장',
+      goals:[
+        {label:'저널 작성',unit:'회',target:48,actual:0},
+        {label:'분기 회고 완료',unit:'회',target:4,actual:0}
+      ]}
+  ],
+  months: [
+    {month:'1월',theme:'리셋 & 설계',q:1,tasks:[
+      {text:'Notion 하루 루틴 템플릿 세팅',p:'p1',done:false},
+      {text:'기상~취침 시간 블록 설계',p:'p1',done:false},
+      {text:'2025년 수입·지출 결산',p:'p2',done:false},
+      {text:'2026 월 예산안 초안 작성',p:'p2',done:false},
+      {text:'신학기 커리큘럼 계획 (초1~3 과목별)',p:'p3',done:false},
+      {text:'학부모 신년 안내문 발송',p:'p3',done:false},
+      {text:'체험 수업 프로그램 기획',p:'p3',done:false}
+    ]},
+    {month:'2월',theme:'루틴 정착',q:1,tasks:[
+      {text:'공부방+개인 시간 주간 루틴 정착',p:'p1',done:false},
+      {text:'저축 자동이체 설정',p:'p2',done:false},
+      {text:'스마트스토어 수익 목표 수립',p:'p2',done:false},
+      {text:'식단·운동 주간 체크리스트 시작',p:'p4',done:false},
+      {text:'수면 루틴 점검',p:'p4',done:false},
+      {text:'타임창(2시·6시) 반별 운영 루틴 확정',p:'p3',done:false},
+      {text:'대기자 구글폼 양식 세팅',p:'p3',done:false}
+    ]},
+    {month:'3월',theme:'1단계 시작 — 브랜딩·시스템',q:1,tasks:[
+      {text:'[1단계 시작] 체험→상담→등록 루틴 문서화',p:'p3',done:false},
+      {text:'상담 전후 문자 자동발송 문구 작성',p:'p3',done:false},
+      {text:'인스타 주간 콘텐츠 루틴 요일별 계획표 작성',p:'p3',done:false},
+      {text:'SNS 후기·수업기록 콘텐츠 양식 만들기',p:'p3',done:false},
+      {text:'구글폼/노션 자동화 도구 세팅 시작',p:'p1',done:false},
+      {text:'Q1 예산 대비 실적 점검',p:'p2',done:false},
+      {text:'분기 회고 저널 작성',p:'p5',done:false}
+    ]},
+    {month:'4월',theme:'시스템 구축·브랜딩 집중',q:2,tasks:[
+      {text:'성장기록 리포트 Canva 템플릿 기본 틀 완성',p:'p2',done:false},
+      {text:'스마트스토어 상품 등록 (학습보고서 템플릿)',p:'p2',done:false},
+      {text:'학습기록지 구글폼 자동화 연결',p:'p1',done:false},
+      {text:'상담 템플릿 완성 (상담카드+문자)',p:'p3',done:false},
+      {text:'인스타 콘텐츠 캘린더 4~6월 수립',p:'p3',done:false},
+      {text:'지역 맘카페 정기 홍보 시작',p:'p3',done:false},
+      {text:'봄 체중·식단 루틴 점검',p:'p4',done:false}
+    ]},
+    {month:'5월',theme:'수입 다각화·모집 캠페인',q:2,tasks:[
+      {text:'스마트스토어 매출 분석 & 보완',p:'p2',done:false},
+      {text:'신규 수강생 모집 캠페인 (친구 추천 혜택)',p:'p3',done:false},
+      {text:'학부모 커뮤니티 연동 방법 결정',p:'p3',done:false},
+      {text:'여름 대비 계절 플래너 업데이트',p:'p1',done:false},
+      {text:'자기 돌봄 루틴 점검',p:'p4',done:false},
+      {text:'감정 일지 꾸준히 작성',p:'p5',done:false}
+    ]},
+    {month:'6월',theme:'1단계 마무리·2단계 준비',q:2,tasks:[
+      {text:'[1단계 점검] 수강생 20명 달성 여부 확인',p:'p3',done:false},
+      {text:'후기 콘텐츠 자동화 파이프라인 구축',p:'p3',done:false},
+      {text:'방학 특강 기획 (추가 반 편성)',p:'p3',done:false},
+      {text:'상반기 수입·지출·루틴 리뷰',p:'p2',done:false},
+      {text:'상반기 감정일지 회고',p:'p5',done:false},
+      {text:'하반기 목표·방향 재설정',p:'p5',done:false},
+      {text:'2분기 회고 저널',p:'p5',done:false}
+    ]},
+    {month:'7월',theme:'2단계 시작 — 추가 반·자동화',q:3,tasks:[
+      {text:'[2단계 시작] 추가 반 편성 (학년별 세분화)',p:'p3',done:false},
+      {text:'여름 방학 특강 프로그램 운영',p:'p3',done:false},
+      {text:'Notion DB 연동 — 학생별 진도·출결 통합 관리',p:'p1',done:false},
+      {text:'보조교사 채용 기준 + 인력 확보 계획 수립',p:'p3',done:false},
+      {text:'월간 성장보고서 템플릿 2차 출시',p:'p2',done:false},
+      {text:'여름 루틴 재정비',p:'p4',done:false}
+    ]},
+    {month:'8월',theme:'콘텐츠·자동화 고도화',q:3,tasks:[
+      {text:'학부모 알림 자동화 (문자/카톡) 도구 세팅',p:'p3',done:false},
+      {text:'지역대표 "기초습관 코칭공부방" 콘텐츠 기획',p:'p3',done:false},
+      {text:'가을 학기 모집 콘텐츠 예약 발행',p:'p3',done:false},
+      {text:'Q2 실적 분석 & 하반기 저축 조정',p:'p2',done:false},
+      {text:'패션·외모 루틴 점검',p:'p4',done:false},
+      {text:'가을 목표 의사결정 점검',p:'p5',done:false}
+    ]},
+    {month:'9월',theme:'가을 학기 런칭·2단계 점검',q:3,tasks:[
+      {text:'[2단계 점검] 수강생 30명 달성 여부 확인',p:'p3',done:false},
+      {text:'신학기 수강생 온보딩',p:'p3',done:false},
+      {text:'주제별 미니 특강 도입 (방논술·독서코칭·속독)',p:'p3',done:false},
+      {text:'가을·겨울 플래너 업데이트',p:'p1',done:false},
+      {text:'Q3 회고 + 연말 목표 중간 점검',p:'p5',done:false},
+      {text:'인스타 가을 콘텐츠 시리즈 기획',p:'p3',done:false}
+    ]},
+    {month:'10월',theme:'3단계 준비 — 학원형 전환',q:4,tasks:[
+      {text:'[3단계 준비] 학원 등록 행정·교육청 신고 요건 파악',p:'p3',done:false},
+      {text:'브랜드 로고·웹사이트 제작 기획',p:'p3',done:false},
+      {text:'수익구조 다각화 기획 (코칭반·방학반·부모교육)',p:'p2',done:false},
+      {text:'공간 이전/리모델링 사업계획 검토',p:'p3',done:false},
+      {text:'연말 세금·소득 정리 준비',p:'p2',done:false},
+      {text:'자기 리더십 의사결정 점검',p:'p5',done:false}
+    ]},
+    {month:'11월',theme:'브랜딩·독립 시스템',q:4,tasks:[
+      {text:'브랜드화학원 전환 슬로건 기획',p:'p3',done:false},
+      {text:'로고·웹사이트 등 브랜딩 작업 시작',p:'p3',done:false},
+      {text:'연간 커리큘럼 개발·반편성 기준 수립',p:'p3',done:false},
+      {text:'멤버십운영·수업기록 디지털 관리 시스템 구축',p:'p1',done:false},
+      {text:'연간 수입·지출 결산 초안',p:'p2',done:false},
+      {text:'연간 감정·성장 저널 마무리',p:'p5',done:false}
+    ]},
+    {month:'12월',theme:'결산 & 2027 학원 설계',q:4,tasks:[
+      {text:'[3단계 완성] 학원형 독립브랜딩 런칭 준비 완료 확인',p:'p3',done:false},
+      {text:'학습코칭 시스템 강화 — 자기주도학습 앱 검토',p:'p3',done:false},
+      {text:'2026 연간 회고 (5대 프로젝트 달성률)',p:'p5',done:false},
+      {text:'연말 학생 선물·이벤트 준비',p:'p3',done:false},
+      {text:'저축 달성 확인 & 2027 예산 수립',p:'p2',done:false},
+      {text:'2027 목표·비전 수립 (학원 정식 운영)',p:'p5',done:false}
+    ]}
+  ],
+  weekly: [
+    {day:'월요일',tasks:[{text:'주간 계획 세우기',done:false},{text:'이번 주 예산 체크',done:false}]},
+    {day:'화요일',tasks:[{text:'수강생 학습 노트 정리',done:false},{text:'학부모 메시지 확인',done:false}]},
+    {day:'수요일',tasks:[{text:'인스타그램 콘텐츠 발행',done:false},{text:'스마트스토어 현황 확인',done:false}]},
+    {day:'목요일',tasks:[{text:'수업 자료 준비',done:false},{text:'운동 & 식단 중간 점검',done:false}]},
+    {day:'금요일',tasks:[{text:'주간 회고 저널 5분 작성',done:false},{text:'다음 주 콘텐츠 초안',done:false}]},
+    {day:'일요일',tasks:[{text:'건강 체크리스트 점검',done:false},{text:'다음 주 준비 & 마음 정리',done:false}]}
+  ],
+  dailyLogs: {},
+  finance: {
+    budget: {
+      income: [
+        {label:'수강료 수입',budget:0,actual:0},
+        {label:'스마트스토어',budget:0,actual:0},
+        {label:'Canva 템플릿',budget:0,actual:0},
+        {label:'기타 수입',budget:0,actual:0}
+      ],
+      expense: [
+        {label:'임차료·관리비',budget:0,actual:0},
+        {label:'교재·교구비',budget:0,actual:0},
+        {label:'마케팅비',budget:0,actual:0},
+        {label:'식비',budget:0,actual:0},
+        {label:'교통비',budget:0,actual:0},
+        {label:'통신·구독',budget:0,actual:0},
+        {label:'의류·미용',budget:0,actual:0},
+        {label:'저축',budget:0,actual:0}
+      ]
+    },
+    monthly: {
+      '1':  {income:[],expense:[],tuition:[]},
+      '2':  {income:[],expense:[],tuition:[]},
+      '3':  {income:[],expense:[],tuition:[]},
+      '4':  {income:[],expense:[],tuition:[]},
+      '5':  {income:[],expense:[],tuition:[]},
+      '6':  {income:[],expense:[],tuition:[]},
+      '7':  {income:[],expense:[],tuition:[]},
+      '8':  {income:[],expense:[],tuition:[]},
+      '9':  {income:[],expense:[],tuition:[]},
+      '10': {income:[],expense:[],tuition:[]},
+      '11': {income:[],expense:[],tuition:[]},
+      '12': {income:[],expense:[],tuition:[]}
+    }
+  }
+};
+</script>
+
+<script>
+// ════════════════════════════════════════════
+// REFERENCES
+// ════════════════════════════════════════════
+var P = SAVE_DATA.projects;
+var M = SAVE_DATA.months;
+var W = SAVE_DATA.weekly;
+const Q_LABELS={1:'Q1 · 기반 다지기',2:'Q2 · 성장 가속',3:'Q3 · 확장·브랜딩',4:'Q4 · 점검·도약'};
+const CIRC=2*Math.PI*14;
+let editMode=false;
+let dirty=false;
+
+// ════════════════════════════════════════════
+// DOWNLOAD — saves entire file with updated data block
+// ════════════════════════════════════════════
+function downloadFile(){
+  // Grab current HTML
+  let html = document.documentElement.outerHTML;
+  // Serialize current SAVE_DATA
+  const json = JSON.stringify(SAVE_DATA, null, 2);
+  // Replace the data block between the script#dataScript tags
+  const startMarker = '<script id="dataScript">';
+  const endMarker   = '<\/script>';
+  const newBlock = `${startMarker}\n// ════════════════════════════════════════════\n// DATA — 이 블록이 파일 저장 시 통째로 교체됩니다\n// ════════════════════════════════════════════\nvar SAVE_DATA = ${json};\n<\/script>`;
+  // Find and replace only the dataScript block
+  const startIdx = html.indexOf(startMarker);
+  // find end after startIdx
+  const endIdx = html.indexOf(endMarker, startIdx + startMarker.length) + endMarker.length;
+  html = html.slice(0,startIdx) + newBlock + html.slice(endIdx);
+
+  const blob = new Blob([html], {type:'text/html;charset=utf-8'});
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = '2026_혜정님_플래너_v5.html';
+  a.click();
+  URL.revokeObjectURL(a.href);
+
+  dirty = false;
+  document.getElementById('saveBanner').classList.remove('show');
+  showToast('💾 파일 저장 완료! 다운로드된 파일을 사용하세요');
+}
+
+function markDirty(){
+  dirty = true;
+  document.getElementById('saveBanner').classList.add('show');
+}
+
+// ════════════════════════════════════════════
+// EDIT MODE
+// ════════════════════════════════════════════
+let editMode_flag=false;
+function toggleEditMode(){
+  editMode_flag=!editMode_flag;
+  editMode=editMode_flag;
+  const btn=document.getElementById('editBtn');
+  btn.classList.toggle('on',editMode);
+  btn.textContent=editMode?'✅ 완료':'✏️ 편집';
+  document.getElementById('editBanner').classList.toggle('show',editMode);
+  document.body.classList.toggle('edit-mode',editMode);
+  rebuildAll();
+  showToast(editMode?'편집 모드 ON':'편집 완료 ✓');
+}
+
+// ════════════════════════════════════════════
+// TOAST
+// ════════════════════════════════════════════
+let toastT;
+function showToast(msg){
+  const t=document.getElementById('toast');
+  t.textContent=msg||'저장됨 ✓';
+  t.classList.add('show');
+  clearTimeout(toastT);
+  toastT=setTimeout(()=>t.classList.remove('show'),2000);
+}
+
+// ════════════════════════════════════════════
+// PROGRESS
+// ════════════════════════════════════════════
+function updateProgress(){
+  let total=0,done=0;
+  M.forEach(m=>m.tasks.forEach(t=>{total++;if(t.done)done++;}));
+  const pct=total?Math.round(done/total*100):0;
+  document.getElementById('totalFill').style.width=pct+'%';
+  document.getElementById('totalCount').textContent=`${done} / ${total} 완료 (${pct}%)`;
+}
+
+// ════════════════════════════════════════════
+// HELPERS
+// ════════════════════════════════════════════
+function pColor(pid){return(P.find(p=>p.id===pid)||{color:'#888'}).color}
+function pLight(pid){return(P.find(p=>p.id===pid)||{light:'#eee'}).light}
+function getDom(tasks){
+  const c={};tasks.forEach(t=>c[t.p]=(c[t.p]||0)+1);
+  return Object.entries(c).sort((a,b)=>b[1]-a[1])[0]?.[0]||'p1';
+}
+function eh(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;')}
+
+// ════════════════════════════════════════════
+// OVERVIEW
+// ════════════════════════════════════════════
+function buildOverview(){
+  let html='';
+  [1,2,3,4].forEach(q=>{
+    html+=`<div class="quarter-label">${Q_LABELS[q]}</div><div class="months-grid">`;
+    M.filter(m=>m.q===q).forEach(mdata=>{
+      html+=buildMonthCard(mdata,M.indexOf(mdata));
+    });
+    html+='</div>';
+  });
+  document.getElementById('overviewContent').innerHTML=html;
+}
+
+function buildMonthCard(mdata,mi){
+  const tasks=mdata.tasks;
+  const total=tasks.length;
+  const done=tasks.filter(t=>t.done).length;
+  const pct=total?Math.round(done/total*100):0;
+  const off=CIRC-(pct/100)*CIRC;
+  const color=pColor(getDom(tasks));
+
+  const rows=tasks.map((t,ti)=>{
+    if(editMode){
+      return `<div class="task-row edit-mode-row">
+        <div class="tag-dot" style="background:${pColor(t.p)}"></div>
+        <input class="edit-inline" value="${eh(t.text)}"
+          onchange="M[${mi}].tasks[${ti}].text=this.value;markDirty();showToast('수정됨 ✓')">
+        <button class="del-btn" onclick="delTask(${mi},${ti})">🗑</button>
+      </div>`;
+    }
+    const postponedBadge=t.postponedFrom?`<span class="postponed-badge">📌 ${t.postponedFrom}에서</span>`:'';
+    const postponeBtn=(!t.done && mi<M.length-1)
+      ?`<button class="postpone-btn" onclick="postponeTask(${mi},${ti})" title="다음 달로 미루기">⏭</button>`:'';
+    return `<label class="task-row${t.done?' done':''}">
+      <input type="checkbox" class="task-cb" onchange="toggleTask(${mi},${ti},this.checked)" ${t.done?'checked':''}>
+      <div class="tag-dot" style="background:${pColor(t.p)}"></div>
+      <span class="task-label">${eh(t.text)}${postponedBadge}</span>
+      ${postponeBtn}
+    </label>`;
+  }).join('');
+
+  const undoneCount=tasks.filter(t=>!t.done).length;
+  const postponeBar=(undoneCount>1 && mi<M.length-1 && !editMode)
+    ?`<div class="postpone-bar">
+        <span class="postpone-bar-label">미완료 ${undoneCount}개</span>
+        <button class="postpone-all-btn" onclick="postponeAll(${mi})">⏭ 미완료 전체 다음 달로</button>
+      </div>`
+    :'';
+
+  const themeField=editMode
+    ?`<input class="edit-inline-theme" value="${eh(mdata.theme)}"
+        onchange="M[${mi}].theme=this.value;markDirty();showToast('수정됨 ✓')">`
+    :`<p>${eh(mdata.theme)}</p>`;
+
+  return `<div class="month-card" data-mid="${mi}">
+    <div class="month-head">
+      <div class="month-head-left">
+        <div class="month-dot" style="background:${color}"></div>
+        <div class="month-info"><h3>${mdata.month}</h3>${themeField}</div>
+      </div>
+      <div class="ring-wrap">
+        <svg width="36" height="36" viewBox="0 0 36 36">
+          <circle class="ring-bg" cx="18" cy="18" r="14"/>
+          <circle class="ring-fill" cx="18" cy="18" r="14"
+            stroke="${color}" stroke-dasharray="${CIRC}" stroke-dashoffset="${off}"/>
+        </svg>
+        <div class="ring-label">${pct}%</div>
+      </div>
+    </div>
+    <div class="month-tasks">
+      ${rows}
+      <div class="add-task-row">
+        <input class="add-task-input" placeholder="+ 할 일 추가..." data-mi="${mi}" maxlength="60">
+        <button class="add-task-btn" onclick="addTask(${mi})">＋</button>
+      </div>
+      ${postponeBar}
+    </div>
+  </div>`;
+}
+
+function toggleTask(mi,ti,v){
+  M[mi].tasks[ti].done=v;
+  const card=document.querySelector(`[data-mid="${mi}"]`);
+  if(card){
+    const rows=card.querySelectorAll('.task-row');
+    if(rows[ti]){rows[ti].classList.toggle('done',v);}
+    // update ring
+    const tasks=M[mi].tasks,total=tasks.length,done=tasks.filter(t=>t.done).length;
+    const pct=total?Math.round(done/total*100):0;
+    const fill=card.querySelector('.ring-fill'),lbl=card.querySelector('.ring-label');
+    if(fill)fill.style.strokeDashoffset=CIRC-(pct/100)*CIRC;
+    if(lbl)lbl.textContent=pct+'%';
+  }
+  updateProgress();
+  markDirty();
+}
+
+function addTask(mi){
+  const inp=document.querySelector(`.add-task-input[data-mi="${mi}"]`);
+  if(!inp||!inp.value.trim())return;
+  M[mi].tasks.push({text:inp.value.trim(),p:getDom(M[mi].tasks),done:false});
+  inp.value='';
+  buildOverview();updateProgress();markDirty();showToast('할 일 추가됨 ✓');
+}
+
+function delTask(mi,ti){
+  if(!confirm(`"${M[mi].tasks[ti].text}" 삭제할까요?`))return;
+  M[mi].tasks.splice(ti,1);
+  rebuildAll();updateProgress();markDirty();showToast('삭제됨');
+}
+
+function postponeTask(mi,ti){
+  if(mi>=M.length-1)return;
+  const task=M[mi].tasks[ti];
+  const nextMonth=M[mi+1].month;
+  if(!confirm(`"${task.text}"\n→ ${nextMonth}으로 미룰까요?`))return;
+  const moved=Object.assign({},task,{done:false,postponedFrom:M[mi].month});
+  M[mi+1].tasks.push(moved);
+  M[mi].tasks.splice(ti,1);
+  buildOverview();updateProgress();markDirty();
+  showToast(`📌 ${nextMonth}으로 이동했어요`);
+}
+
+function postponeAll(mi){
+  if(mi>=M.length-1)return;
+  const nextMonth=M[mi+1].month;
+  const undone=M[mi].tasks.filter(t=>!t.done);
+  if(!undone.length)return;
+  if(!confirm(`미완료 ${undone.length}개를 ${nextMonth}으로 모두 미룰까요?`))return;
+  undone.forEach(t=>{
+    M[mi+1].tasks.push(Object.assign({},t,{done:false,postponedFrom:M[mi].month}));
+  });
+  M[mi].tasks=M[mi].tasks.filter(t=>t.done);
+  buildOverview();updateProgress();markDirty();
+  showToast(`📌 ${undone.length}개 → ${nextMonth}으로 이동했어요`);
+}
+
+document.addEventListener('keydown',e=>{
+  if(e.key==='Enter'&&e.target.classList.contains('add-task-input')){
+    addTask(+e.target.dataset.mi);
+  }
+});
+
+// ════════════════════════════════════════════
+// TRACKER
+// ════════════════════════════════════════════
+function buildTracker(){
+  document.getElementById('projSelector').innerHTML=P.map((p,i)=>
+    `<button class="proj-pill${i===0?' active':''}" data-pid="${p.id}"
+      style="${i===0?`background:${p.color};border-color:${p.color};color:#fff`:''}"
+      onclick="selProj('${p.id}',this)">${p.icon} ${p.name}</button>`
+  ).join('');
+  document.getElementById('trackerContent').innerHTML=P.map((p,i)=>buildProjTracker(p,i===0)).join('');
+}
+
+function selProj(pid,btn){
+  document.querySelectorAll('.proj-pill').forEach(b=>{b.classList.remove('active');b.style.cssText='';});
+  btn.classList.add('active');
+  const proj=P.find(p=>p.id===pid);
+  btn.style.background=proj.color;btn.style.borderColor=proj.color;btn.style.color='#fff';
+  document.querySelectorAll('.proj-tracker').forEach(el=>el.classList.remove('active'));
+  document.getElementById('tracker-'+pid).classList.add('active');
+}
+
+function buildProjTracker(proj,isActive){
+  const pi=P.indexOf(proj);
+  const goalRows=proj.goals.map((g,gi)=>{
+    const pct=g.target>0?Math.min(100,Math.round(g.actual/g.target*100)):0;
+    const labelField=editMode
+      ?`<input class="goal-label-edit" value="${eh(g.label)}"
+          onchange="P[${pi}].goals[${gi}].label=this.value;markDirty();showToast('수정됨 ✓')">`
+      :`<span class="goal-label-text">${eh(g.label)}</span>`;
+    const delBtn=editMode?`<button class="del-btn" onclick="delGoal(${pi},${gi})">🗑</button>`:'';
+    return `<div class="goal-row" data-pi="${pi}" data-gi="${gi}">
+      <div class="goal-row-label">${labelField}${delBtn}</div>
+      <div class="goal-input-wrap">
+        <span>목표 (${g.unit})</span>
+        <input class="goal-input" type="number" value="${g.target}" min="0"
+          onchange="updateGoal(${pi},${gi},'target',+this.value)">
+      </div>
+      <div class="goal-input-wrap">
+        <span>실적 (${g.unit})</span>
+        <input class="goal-input" type="number" value="${g.actual}" min="0"
+          onchange="updateGoal(${pi},${gi},'actual',+this.value)">
+      </div>
+      <div class="goal-compare-bar">
+        <div class="compare-labels"><span>달성률</span><span>${pct}%</span></div>
+        <div class="compare-track" style="background:${proj.light}">
+          <div class="compare-actual-bar" style="width:${pct}%;background:${proj.color}"></div>
+        </div>
+      </div>
+    </div>`;
+  }).join('<hr class="goal-divider">');
+
+  const nameF=editMode
+    ?`<input style="font-family:'Noto Serif KR',serif;font-size:1.1rem;font-weight:700;color:${proj.color};border:1.5px solid var(--edit-border);border-radius:6px;padding:0.2rem 0.5rem;background:var(--edit-bg);outline:none;width:100%"
+        value="${eh(proj.name)}" onchange="P[${pi}].name=this.value;markDirty();showToast('수정됨 ✓');document.querySelector('[data-pid=${proj.id}]').innerHTML='${proj.icon} '+this.value">`
+    :`<h2 style="color:${proj.color}">${proj.icon} ${eh(proj.name)}</h2>`;
+  const descF=editMode
+    ?`<textarea class="edit-inline-desc" rows="2"
+        onchange="P[${pi}].desc=this.value;markDirty();showToast('수정됨 ✓')">${eh(proj.desc)}</textarea>`
+    :`<p>${eh(proj.desc)}</p>`;
+
+  const monthlyHTML=M.map((mdata,mi)=>{
+    const projTasks=mdata.tasks.map((t,ti)=>({...t,ti})).filter(t=>t.p===proj.id);
+    if(!projTasks.length)return'';
+    const done=projTasks.filter(t=>t.done).length;
+    const pct=Math.round(done/projTasks.length*100);
+    const tRows=projTasks.map(t=>{
+      if(editMode){
+        return `<div class="task-row edit-mode-row">
+          <div class="tag-dot" style="background:${proj.color}"></div>
+          <input class="edit-inline" value="${eh(t.text)}"
+            onchange="M[${mi}].tasks[${t.ti}].text=this.value;markDirty();showToast('수정됨 ✓')">
+          <button class="del-btn" onclick="delTask(${mi},${t.ti})">🗑</button>
+        </div>`;
+      }
+      return `<label class="task-row${t.done?' done':''}">
+        <input type="checkbox" class="task-cb" onchange="toggleTask(${mi},${t.ti},this.checked)" ${t.done?'checked':''}>
+        <div class="tag-dot" style="background:${proj.color}"></div>
+        <span class="task-label">${eh(t.text)}</span>
+      </label>`;
+    }).join('');
+    return `<div class="detail-month-card" id="dtl-${proj.id}-${mi}">
+      <div class="detail-month-head" onclick="document.getElementById('dtl-${proj.id}-${mi}').classList.toggle('open')">
+        <h4><span style="color:${proj.color}">${mdata.month}</span></h4>
+        <div style="display:flex;align-items:center;gap:0.5rem">
+          <span class="detail-month-theme">${eh(mdata.theme)}</span>
+          <span class="detail-month-pct" style="color:${proj.color}">${pct}%</span>
+          <span class="detail-chevron">▼</span>
+        </div>
+      </div>
+      <div class="detail-body"><div class="detail-tasks">${tRows}</div></div>
+    </div>`;
+  }).filter(Boolean).join('');
+
+  return `<div class="proj-tracker${isActive?' active':''}" id="tracker-${proj.id}">
+    <div class="tracker-header" style="border-left:4px solid ${proj.color}">${nameF}${descF}</div>
+    <div class="goal-vs-section">
+      <div class="section-title">목표 vs 실적</div>
+      <div class="goal-rows">${goalRows}</div>
+      <button class="add-goal-btn" onclick="addGoal(${pi})">＋ 목표 항목 추가</button>
+    </div>
+    <div class="section-title" style="margin:1rem 0 0.5rem;padding:0 0.2rem">월별 세부 할 일</div>
+    <div class="monthly-detail-grid">${monthlyHTML}</div>
+  </div>`;
+}
+
+function updateGoal(pi,gi,field,val){
+  P[pi].goals[gi][field]=val;
+  const row=document.querySelector(`[data-pi="${pi}"][data-gi="${gi}"]`);
+  if(row){
+    const g=P[pi].goals[gi];
+    const pct=g.target>0?Math.min(100,Math.round(g.actual/g.target*100)):0;
+    const bar=row.querySelector('.compare-actual-bar');
+    const lbl=row.querySelector('.compare-labels span:last-child');
+    if(bar)bar.style.width=pct+'%';
+    if(lbl)lbl.textContent=pct+'%';
+  }
+  markDirty();showToast('저장됨 ✓');
+}
+
+function delGoal(pi,gi){
+  if(!confirm(`"${P[pi].goals[gi].label}" 삭제할까요?`))return;
+  P[pi].goals.splice(gi,1);
+  const pid=P[pi].id;
+  buildTracker();selProj(pid,document.querySelector(`[data-pid="${pid}"]`));
+  markDirty();showToast('삭제됨');
+}
+
+function addGoal(pi){
+  const label=prompt('새 목표 이름:');if(!label)return;
+  const unit=prompt('단위 (예: 개, 만원, 회):')||'개';
+  P[pi].goals.push({label,unit,target:0,actual:0});
+  const pid=P[pi].id;
+  buildTracker();selProj(pid,document.querySelector(`[data-pid="${pid}"]`));
+  markDirty();showToast('목표 추가됨 ✓');
+}
+
+// ════════════════════════════════════════════
+// WEEKLY
+// ════════════════════════════════════════════
+function buildWeekly(){
+  document.getElementById('weeklyGrid').innerHTML=W.map((d,di)=>{
+    const dayLabel=editMode
+      ?`<input class="weekly-day-edit" value="${eh(d.day)}"
+          onchange="W[${di}].day=this.value;markDirty();showToast('수정됨 ✓')">`
+      :d.day;
+    const rows=d.tasks.map((t,ti)=>{
+      if(editMode){
+        return `<div class="task-row edit-mode-row">
+          <input class="edit-inline" value="${eh(t.text)}"
+            onchange="W[${di}].tasks[${ti}].text=this.value;markDirty();showToast('수정됨 ✓')">
+          <button class="del-btn" onclick="W[${di}].tasks.splice(${ti},1);markDirty();buildWeekly();showToast('삭제됨')">🗑</button>
+        </div>`;
+      }
+      return `<label class="task-row${t.done?' done':''}">
+        <input type="checkbox" class="task-cb"
+          onchange="W[${di}].tasks[${ti}].done=this.checked;this.closest('.task-row').classList.toggle('done',this.checked);markDirty()" ${t.done?'checked':''}>
+        <span class="task-label">${eh(t.text)}</span>
+      </label>`;
+    }).join('');
+    const addBtn=`<button class="add-weekly-btn" onclick="
+      var t=prompt('새 루틴 항목:');if(!t)return;
+      W[${di}].tasks.push({text:t,done:false});markDirty();buildWeekly();showToast('추가됨 ✓')">＋ 추가</button>`;
+    return `<div class="weekly-card">
+      <div class="weekly-day-name">${dayLabel}</div>
+      ${rows}
+      ${editMode?addBtn:''}
+    </div>`;
+  }).join('');
+}
+
+// ════════════════════════════════════════════
+// NAV
+// ════════════════════════════════════════════
+function showPage(id,btn){
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
+  document.getElementById('page-'+id).classList.add('active');
+  btn.classList.add('active');
+}
+
+function rebuildAll(){buildOverview();buildTracker();buildWeekly();}
+
+// ════════════════════════════════════════════
+// DAILY ROUTINE
+// ════════════════════════════════════════════
+var DL = SAVE_DATA.dailyLogs;
+var currentDailyDate = todayKey();
+
+function todayKey(){
+  const d=new Date();
+  return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+}
+
+function dateLabel(key){
+  const [y,m,d]=key.split('-');
+  const days=['일','월','화','수','목','금','토'];
+  const wd=days[new Date(key).getDay()];
+  return `${y}년 ${parseInt(m)}월 ${parseInt(d)}일 (${wd})`;
+}
+
+function getDayLog(key){
+  if(!DL[key]){
+    DL[key]={
+      mood:'',
+      todos:[
+        {text:'수업 자료 준비',done:false,pri:'mid'},
+        {text:'학부모 알림 확인',done:false,pri:'mid'},
+        {text:'인스타 콘텐츠 업로드',done:false,pri:'low'},
+        {text:'저녁 식단 기록',done:false,pri:'low'}
+      ],
+      morning:[
+        {time:'06:30',text:'기상·스트레칭',done:false},
+        {time:'07:00',text:'세안·준비',done:false},
+        {time:'07:30',text:'아침 식사',done:false},
+        {time:'08:00',text:'오늘 할 일 확인',done:false},
+        {time:'09:00',text:'',done:false},
+        {time:'10:00',text:'',done:false},
+        {time:'11:00',text:'',done:false}
+      ],
+      afternoon:[
+        {time:'14:00',text:'공부방 수업 시작',done:false},
+        {time:'15:00',text:'수업 (2반)',done:false},
+        {time:'16:00',text:'',done:false},
+        {time:'17:00',text:'',done:false},
+        {time:'18:00',text:'공부방 수업 (저녁반)',done:false},
+        {time:'19:00',text:'수업 (저녁반 2)',done:false},
+        {time:'20:00',text:'수업 마무리·정리',done:false}
+      ],
+      evening:[
+        {time:'21:00',text:'저녁 식사·휴식',done:false},
+        {time:'21:30',text:'개인 시간 (독서·콘텐츠)',done:false},
+        {time:'22:00',text:'스마트스토어·인스타 점검',done:false},
+        {time:'22:30',text:'',done:false}
+      ],
+      night:[
+        {time:'23:00',text:'하루 회고 3줄 작성',done:false},
+        {time:'23:15',text:'내일 할 일 미리 확인',done:false},
+        {time:'23:30',text:'휴대폰 내려놓기',done:false},
+        {time:'00:00',text:'취침',done:false}
+      ],
+      memo:''
+    };
+  }
+  return DL[key];
+}
+
+function buildDaily(){
+  const log=getDayLog(currentDailyDate);
+  const isToday=currentDailyDate===todayKey();
+  const doneTodos=log.todos.filter(t=>t.done).length;
+
+  const moods=[
+    {e:'😊',l:'좋음'},{e:'😐',l:'보통'},{e:'😴',l:'피곤'},{e:'😤',l:'바쁨'},{e:'🌱',l:'성장'}
+  ];
+  const moodHTML=moods.map(m=>`
+    <button class="mood-btn${log.mood===m.e?' selected':''}" onclick="setMood('${m.e}')">${m.e} ${m.l}</button>
+  `).join('');
+
+  const blockHTML=(slots,key)=>slots.map((s,si)=>`
+    <div class="daily-slot">
+      <span class="slot-time">${s.time}</span>
+      <input class="slot-input" value="${eh(s.text)}" placeholder="입력..."
+        onchange="DL['${currentDailyDate}']['${key}'][${si}].text=this.value;markDirty();showToast('저장됨 ✓')">
+      <input type="checkbox" class="slot-cb" ${s.done?'checked':''}
+        onchange="DL['${currentDailyDate}']['${key}'][${si}].done=this.checked;markDirty()">
+    </div>`).join('');
+
+  const todoHTML=log.todos.map((t,ti)=>`
+    <label class="task-row${t.done?' done':''}">
+      <input type="checkbox" class="task-cb"
+        onchange="DL['${currentDailyDate}'].todos[${ti}].done=this.checked;this.closest('.task-row').classList.toggle('done',this.checked);updateTodoBadge();markDirty();" ${t.done?'checked':''}>
+      <div class="daily-priority">
+        <div class="pri-dot high${t.pri==='high'?' on':''}" onclick="setPri(${ti},'high')" title="중요"></div>
+        <div class="pri-dot mid${t.pri==='mid'?' on':''}" onclick="setPri(${ti},'mid')" title="보통"></div>
+        <div class="pri-dot low${t.pri==='low'?' on':''}" onclick="setPri(${ti},'low')" title="여유"></div>
+      </div>
+      <span class="task-label">${eh(t.text)}</span>
+      <button class="del-btn" onclick="DL['${currentDailyDate}'].todos.splice(${ti},1);markDirty();buildDaily();">🗑</button>
+    </label>`).join('');
+
+  document.getElementById('dailyContent').innerHTML=`
+    <div class="daily-nav">
+      <button class="daily-nav-btn" onclick="moveDailyDate(-1)">◀ 전날</button>
+      <span class="daily-nav-date">${dateLabel(currentDailyDate)}</span>
+      <button class="daily-nav-btn" onclick="moveDailyDate(1)">다음날 ▶</button>
+    </div>
+
+    <div class="daily-header">
+      <div class="daily-header-left">
+        <h2>☀️ 오늘의 루틴</h2>
+        <p>할 일 ${doneTodos}/${log.todos.length} 완료 · 컨디션을 체크해보세요</p>
+      </div>
+      <div class="daily-date-badge">${isToday?'📍 오늘':dateLabel(currentDailyDate).split(' ').slice(0,3).join(' ')}</div>
+    </div>
+
+    <div class="daily-mood">
+      <div class="daily-mood-title">오늘 컨디션은?</div>
+      <div class="mood-btns">${moodHTML}</div>
+    </div>
+
+    <div class="daily-todo">
+      <div class="daily-todo-head">
+        <div class="daily-todo-title">📋 오늘의 할 일 <span class="todo-count-badge" id="todoBadge">${doneTodos}/${log.todos.length}</span></div>
+      </div>
+      <div class="daily-todo-list">${todoHTML}</div>
+      <div class="daily-todo-add">
+        <input class="daily-todo-input" id="newTodoInput" placeholder="할 일 추가..." onkeydown="if(event.key==='Enter')addDailyTodo()">
+        <button class="daily-todo-btn" onclick="addDailyTodo()">＋</button>
+      </div>
+    </div>
+
+    <div class="daily-grid">
+      <div class="daily-block">
+        <div class="daily-block-head">
+          <span class="daily-block-icon">🌅</span>
+          <span class="daily-block-title">오전 루틴</span>
+          <span class="daily-block-time">06:30 – 12:00</span>
+        </div>
+        <div class="daily-slots">${blockHTML(log.morning,'morning')}</div>
+      </div>
+      <div class="daily-block">
+        <div class="daily-block-head">
+          <span class="daily-block-icon">📚</span>
+          <span class="daily-block-title">공부방 수업</span>
+          <span class="daily-block-time">14:00 – 20:00</span>
+        </div>
+        <div class="daily-slots">${blockHTML(log.afternoon,'afternoon')}</div>
+      </div>
+      <div class="daily-block">
+        <div class="daily-block-head">
+          <span class="daily-block-icon">🌙</span>
+          <span class="daily-block-title">저녁·개인 시간</span>
+          <span class="daily-block-time">21:00 – 23:00</span>
+        </div>
+        <div class="daily-slots">${blockHTML(log.evening,'evening')}</div>
+      </div>
+      <div class="daily-block">
+        <div class="daily-block-head">
+          <span class="daily-block-icon">🌛</span>
+          <span class="daily-block-title">자기 전 루틴</span>
+          <span class="daily-block-time">23:00 – 취침</span>
+        </div>
+        <div class="daily-slots">${blockHTML(log.night,'night')}</div>
+      </div>
+    </div>
+
+    <div class="daily-memo">
+      <div class="daily-memo-head">📝 오늘 하루 한 줄 메모</div>
+      <textarea placeholder="오늘 느낀 점, 내일 할 일, 감사한 것 등 자유롭게..."
+        onchange="DL['${currentDailyDate}'].memo=this.value;markDirty();showToast('메모 저장됨 ✓')">${eh(log.memo)}</textarea>
+    </div>
+  `;
+}
+
+function setMood(e){
+  getDayLog(currentDailyDate).mood=e;
+  markDirty();buildDaily();showToast(e+' 컨디션 저장됨');
+}
+
+function setPri(ti,pri){
+  getDayLog(currentDailyDate).todos[ti].pri=pri;
+  markDirty();buildDaily();
+}
+
+function updateTodoBadge(){
+  const log=getDayLog(currentDailyDate);
+  const done=log.todos.filter(t=>t.done).length;
+  const el=document.getElementById('todoBadge');
+  if(el)el.textContent=`${done}/${log.todos.length}`;
+}
+
+function addDailyTodo(){
+  const inp=document.getElementById('newTodoInput');
+  if(!inp||!inp.value.trim())return;
+  getDayLog(currentDailyDate).todos.push({text:inp.value.trim(),done:false,pri:'mid'});
+  markDirty();buildDaily();showToast('추가됨 ✓');
+}
+
+function moveDailyDate(delta){
+  const d=new Date(currentDailyDate);
+  d.setDate(d.getDate()+delta);
+  currentDailyDate=`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+  buildDaily();
+}
+
+// ════════════════════════════════════════════
+// FINANCE
+// ════════════════════════════════════════════
+var FIN = SAVE_DATA.finance;
+var currentFinMonth = String(new Date().getMonth()+1);
+
+function buildFinance(){
+  const mo = currentFinMonth;
+  const mdata = FIN.monthly[mo];
+  const budget = FIN.budget;
+
+  // 이번 달 실적 합산
+  const incActual = budget.income.reduce((s,r)=>s+Number(r.actual||0),0);
+  const expActual = budget.expense.reduce((s,r)=>s+Number(r.actual||0),0);
+  const incBudget = budget.income.reduce((s,r)=>s+Number(r.budget||0),0);
+  const expBudget = budget.expense.reduce((s,r)=>s+Number(r.budget||0),0);
+  const tuitionTotal = (mdata.tuition||[]).reduce((s,t)=>s+(t.paid?Number(t.fee||0):0),0);
+  const net = incActual - expActual;
+  const savingsRow = budget.expense.find(r=>r.label==='저축');
+  const savings = Number(savingsRow?.actual||0);
+  const saveRate = incActual>0 ? Math.round(savings/incActual*100) : 0;
+
+  // KPI
+  const kpiClass = (v,good,warn) => v>=good?'good':v>=warn?'warn':'bad';
+  const fmtW = v => v>=10000?`${(v/10000).toFixed(1)}억`:(v>=1000?`${Math.round(v/10000*10)/10}천`:`${v.toLocaleString()}원`);
+  const fmt = v => v.toLocaleString()+'원';
+
+  // 연간 수입 바 차트
+  const monthNums = Array.from({length:12},(_,i)=>String(i+1));
+  const yearlyInc = monthNums.map(m=>budget.income.reduce((s,r)=>s+Number(r.actual||0),0)); // 예시: 실제론 monthly별 합산
+  const maxY = Math.max(...yearlyInc,1);
+  const yearlyBarHTML = monthNums.map(m=>{
+    const isActive = m===currentFinMonth;
+    const val = budget.income.reduce((s,r)=>s+Number(r.actual||0),0); // 단순화: 실제 월별은 아래 상세에서
+    return `<div class="fin-y-col" onclick="currentFinMonth='${m}';buildFinance()">
+      <div class="fin-y-bar" style="height:${Math.max(3,Math.round(30*(val/maxY)))}px;background:${isActive?'#c9a227':'#e6d8c8'}"></div>
+      <div class="fin-y-label" style="color:${isActive?'#c9a227':'var(--brown3)'}">${m}월</div>
+    </div>`;
+  }).join('');
+
+  // 월 탭
+  const monthTabsHTML = monthNums.map(m=>`
+    <button class="fin-mtab${m===currentFinMonth?' active':''}" onclick="currentFinMonth='${m}';buildFinance()">${m}월</button>
+  `).join('');
+
+  // 예산 행 렌더
+  const renderRows = (rows, type) => rows.map((r,ri)=>{
+    const b=Number(r.budget||0), a=Number(r.actual||0);
+    const diff=type==='income'?a-b:b-a;
+    const diffClass=diff>0?'plus':diff<0?'minus':'zero';
+    const diffText=diff===0?'-':(diff>0?'+':'')+diff.toLocaleString();
+    const pct=b>0?Math.min(100,Math.round(a/b*100)):0;
+    const barColor=type==='income'?'#5a9467':'#c4714f';
+    return `<div class="fin-row">
+      <span class="fin-row-label">${eh(r.label)}</span>
+      <div><input class="fin-input" type="number" placeholder="예산" value="${r.budget||''}"
+        onchange="FIN.budget.${type}[${ri}].budget=Number(this.value);markDirty();buildFinance()">
+        <div class="fin-bar-wrap"><div class="fin-bar-fill" style="width:${pct}%;background:${barColor}20;border:1px solid ${barColor}40"></div></div>
+      </div>
+      <div><input class="fin-input" type="number" placeholder="실적" value="${r.actual||''}"
+        onchange="FIN.budget.${type}[${ri}].actual=Number(this.value);markDirty();buildFinance()">
+        <div class="fin-bar-wrap"><div class="fin-bar-fill" style="width:${pct}%;background:${barColor}"></div></div>
+      </div>
+      <div class="fin-diff ${diffClass}">${diffText}</div>
+    </div>`;
+  }).join('');
+
+  // 수강생 수강료 트래킹
+  const tuitionRows = (mdata.tuition||[]).map((t,ti)=>`
+    <div class="fin-student-card">
+      <div class="fin-student-name">${eh(t.name)}</div>
+      <div class="fin-student-row">
+        <span class="fin-student-label">수강료</span>
+        <input class="fin-student-input" type="number" value="${t.fee||''}" placeholder="0"
+          onchange="FIN.monthly['${mo}'].tuition[${ti}].fee=Number(this.value);markDirty();buildFinance()">
+      </div>
+      <div class="fin-student-row" style="margin-top:0.2rem">
+        <span class="fin-student-label">납부</span>
+        <input type="checkbox" class="fin-student-cb" ${t.paid?'checked':''}
+          onchange="FIN.monthly['${mo}'].tuition[${ti}].paid=this.checked;markDirty();buildFinance()">
+        <button class="del-btn" style="margin-left:auto" onclick="FIN.monthly['${mo}'].tuition.splice(${ti},1);markDirty();buildFinance()">🗑</button>
+      </div>
+    </div>`).join('');
+
+  const paidCount = (mdata.tuition||[]).filter(t=>t.paid).length;
+  const totalCount = (mdata.tuition||[]).length;
+
+  document.getElementById('financeContent').innerHTML=`
+    <div class="fin-summary-grid">
+      <div class="fin-kpi ${kpiClass(incActual,incBudget*0.9,incBudget*0.7)}">
+        <div class="fin-kpi-label">이번 달 수입</div>
+        <div class="fin-kpi-value">${incActual?incActual.toLocaleString():'—'}</div>
+        <div class="fin-kpi-sub">예산 ${incBudget?incBudget.toLocaleString()+'원':'미설정'}</div>
+      </div>
+      <div class="fin-kpi ${kpiClass(expBudget-expActual,0,-expBudget*0.1)}">
+        <div class="fin-kpi-label">이번 달 지출</div>
+        <div class="fin-kpi-value">${expActual?expActual.toLocaleString():'—'}</div>
+        <div class="fin-kpi-sub">예산 ${expBudget?expBudget.toLocaleString()+'원':'미설정'}</div>
+      </div>
+      <div class="fin-kpi ${net>=0?'good':'bad'}">
+        <div class="fin-kpi-label">순수익</div>
+        <div class="fin-kpi-value">${net?(net>0?'+':'')+net.toLocaleString():'—'}</div>
+        <div class="fin-kpi-sub">수입 - 지출</div>
+      </div>
+      <div class="fin-kpi ${kpiClass(saveRate,25,15)}">
+        <div class="fin-kpi-label">저축률</div>
+        <div class="fin-kpi-value">${saveRate?saveRate+'%':'—'}</div>
+        <div class="fin-kpi-sub">목표 25% 이상</div>
+      </div>
+      <div class="fin-kpi">
+        <div class="fin-kpi-label">수강료 납부</div>
+        <div class="fin-kpi-value" style="color:#5a9467">${tuitionTotal?tuitionTotal.toLocaleString():'—'}</div>
+        <div class="fin-kpi-sub">${totalCount?paidCount+'/'+totalCount+'명 납부':'학생 미등록'}</div>
+      </div>
+    </div>
+
+    <div class="fin-card" style="margin-bottom:0.8rem">
+      <div class="fin-card-head">
+        <span class="fin-card-title">📊 월별 현황</span>
+      </div>
+      <div class="fin-yearly-bar">${yearlyBarHTML}</div>
+    </div>
+
+    <div class="fin-month-tabs">${monthTabsHTML}</div>
+
+    <div class="fin-card">
+      <div class="fin-card-head">
+        <span class="fin-card-title">💚 수입 <span style="font-size:0.62rem;color:var(--brown3);font-weight:400">뱅크샐러드 보고 월말에 입력</span></span>
+        <span class="fin-card-total">${incActual?incActual.toLocaleString()+'원':''}</span>
+      </div>
+      <div class="fin-section-label" style="display:grid;grid-template-columns:1fr 90px 90px 50px;gap:0.4rem;padding:0.4rem 1.1rem 0.2rem;font-size:0.6rem">
+        <span>항목</span><span style="text-align:right">예산</span><span style="text-align:right">실적</span><span style="text-align:right">차이</span>
+      </div>
+      <div class="fin-rows">${renderRows(budget.income,'income')}</div>
+      <div class="fin-add-row">
+        <input class="fin-add-input" id="newIncInput" placeholder="+ 수입 항목 추가..." onkeydown="if(event.key==='Enter')addFinRow('income')">
+        <button class="fin-add-btn" onclick="addFinRow('income')">＋</button>
+      </div>
+    </div>
+
+    <div class="fin-card">
+      <div class="fin-card-head">
+        <span class="fin-card-title">🔴 지출</span>
+        <span class="fin-card-total">${expActual?expActual.toLocaleString()+'원':''}</span>
+      </div>
+      <div class="fin-section-label" style="display:grid;grid-template-columns:1fr 90px 90px 50px;gap:0.4rem;padding:0.4rem 1.1rem 0.2rem;font-size:0.6rem">
+        <span>항목</span><span style="text-align:right">예산</span><span style="text-align:right">실적</span><span style="text-align:right">차이</span>
+      </div>
+      <div class="fin-rows">${renderRows(budget.expense,'expense')}</div>
+      <div class="fin-add-row">
+        <input class="fin-add-input" id="newExpInput" placeholder="+ 지출 항목 추가..." onkeydown="if(event.key==='Enter')addFinRow('expense')">
+        <button class="fin-add-btn" onclick="addFinRow('expense')">＋</button>
+      </div>
+    </div>
+
+    <div class="fin-card">
+      <div class="fin-card-head">
+        <span class="fin-card-title">📚 ${mo}월 수강료 트래킹 <span style="font-size:0.62rem;color:var(--brown3);font-weight:400">${totalCount}명 등록 · ${paidCount}명 납부</span></span>
+        <span class="fin-card-total" style="color:#5a9467">${tuitionTotal?tuitionTotal.toLocaleString()+'원':''}</span>
+      </div>
+      <div class="fin-tuition-grid">${tuitionRows}</div>
+      <div class="fin-add-student">
+        <input class="fin-add-input" id="newStudentInput" placeholder="학생 이름 추가..." onkeydown="if(event.key==='Enter')addStudent()">
+        <button class="fin-add-btn" onclick="addStudent()">＋</button>
+      </div>
+    </div>
+  `;
+}
+
+function addFinRow(type){
+  const id=type==='income'?'newIncInput':'newExpInput';
+  const inp=document.getElementById(id);
+  if(!inp||!inp.value.trim())return;
+  FIN.budget[type].push({label:inp.value.trim(),budget:0,actual:0});
+  markDirty();buildFinance();showToast('항목 추가됨 ✓');
+}
+
+function addStudent(){
+  const inp=document.getElementById('newStudentInput');
+  if(!inp||!inp.value.trim())return;
+  const mo=currentFinMonth;
+  if(!FIN.monthly[mo].tuition)FIN.monthly[mo].tuition=[];
+  FIN.monthly[mo].tuition.push({name:inp.value.trim(),fee:0,paid:false});
+  markDirty();buildFinance();showToast('학생 추가됨 ✓');
+}
+
+// ════════════════════════════════════════════
+// INIT
+// ════════════════════════════════════════════
+rebuildAll();
+updateProgress();
+</script>
+</body>
+</html>
