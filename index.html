@@ -259,7 +259,8 @@ body{font-family:'Noto Sans KR',sans-serif;background:var(--cream);color:var(--i
     </div>
     <div class="hdr-btns">
       <button class="hdr-btn" id="editBtn" onclick="toggleEditMode()">✏️ 편집</button>
-      <button class="hdr-btn save-btn" onclick="downloadFile()">💾 저장</button>
+      <button class="hdr-btn save-btn" onclick="saveToLocal()">💾 저장</button>
+      <button class="hdr-btn" onclick="downloadFile()" style="font-size:0.65rem">📥 백업</button>
     </div>
   </div>
   <div class="tabs">
@@ -273,8 +274,8 @@ body{font-family:'Noto Sans KR',sans-serif;background:var(--cream);color:var(--i
 
 <div class="edit-banner" id="editBanner">✏️ 편집 모드 — 텍스트를 클릭해 수정, 🗑 버튼으로 삭제 | 완료 후 반드시 💾 저장을 눌러주세요</div>
 <div class="save-banner" id="saveBanner">
-  <span>변경 내용이 있어요. 저장하면 폰에서도 그대로 열려요!</span>
-  <button class="save-now-btn" onclick="downloadFile()">📥 지금 저장하기</button>
+  <span>변경 중... 잠시 후 자동 저장돼요</span>
+  <button class="save-now-btn" onclick="saveToLocal()">💾 지금 저장</button>
 </div>
 
 <div class="total-progress">
@@ -505,38 +506,61 @@ let editMode=false;
 let dirty=false;
 
 // ════════════════════════════════════════════
-// DOWNLOAD — saves entire file with updated data block
+// AUTO SAVE — localStorage 자동 저장
 // ════════════════════════════════════════════
+const LS_KEY = 'planner_2026_hyejung';
+
+function saveToLocal(){
+  try {
+    localStorage.setItem(LS_KEY, JSON.stringify(SAVE_DATA));
+    dirty = false;
+    document.getElementById('saveBanner').classList.remove('show');
+    showToast('✅ 자동 저장됨');
+  } catch(e) {
+    showToast('⚠️ 저장 실패 — 저장공간 부족');
+  }
+}
+
+function loadFromLocal(){
+  try {
+    const raw = localStorage.getItem(LS_KEY);
+    if(!raw) return false;
+    const saved = JSON.parse(raw);
+    // 깊은 병합 — 저장된 데이터로 SAVE_DATA 덮어쓰기
+    if(saved.months)   SAVE_DATA.months   = saved.months;
+    if(saved.weekly)   SAVE_DATA.weekly   = saved.weekly;
+    if(saved.dailyLogs)SAVE_DATA.dailyLogs= saved.dailyLogs;
+    if(saved.finance)  SAVE_DATA.finance  = saved.finance;
+    if(saved.projects) SAVE_DATA.projects = saved.projects;
+    return true;
+  } catch(e) { return false; }
+}
+
+// 다운로드 백업 (선택)
 function downloadFile(){
-  // Grab current HTML
-  let html = document.documentElement.outerHTML;
-  // Serialize current SAVE_DATA
   const json = JSON.stringify(SAVE_DATA, null, 2);
-  // Replace the data block between the script#dataScript tags
+  let html = document.documentElement.outerHTML;
   const startMarker = '<script id="dataScript">';
   const endMarker   = '<\/script>';
-  const newBlock = `${startMarker}\n// ════════════════════════════════════════════\n// DATA — 이 블록이 파일 저장 시 통째로 교체됩니다\n// ════════════════════════════════════════════\nvar SAVE_DATA = ${json};\n<\/script>`;
-  // Find and replace only the dataScript block
+  const newBlock = `${startMarker}\nvar SAVE_DATA = ${json};\n<\/script>`;
   const startIdx = html.indexOf(startMarker);
-  // find end after startIdx
   const endIdx = html.indexOf(endMarker, startIdx + startMarker.length) + endMarker.length;
   html = html.slice(0,startIdx) + newBlock + html.slice(endIdx);
-
   const blob = new Blob([html], {type:'text/html;charset=utf-8'});
   const a = document.createElement('a');
   a.href = URL.createObjectURL(blob);
-  a.download = '2026_혜정님_플래너_v5.html';
+  a.download = '2026_혜정님_플래너_백업.html';
   a.click();
   URL.revokeObjectURL(a.href);
-
-  dirty = false;
-  document.getElementById('saveBanner').classList.remove('show');
-  showToast('💾 파일 저장 완료! 다운로드된 파일을 사용하세요');
+  showToast('💾 백업 파일 다운로드 완료');
 }
 
+let saveTimer;
 function markDirty(){
   dirty = true;
-  document.getElementById('saveBanner').classList.add('show');
+  document.getElementById('saveBanner').classList.remove('show');
+  clearTimeout(saveTimer);
+  saveTimer = setTimeout(saveToLocal, 800); // 0.8초 후 자동 저장
 }
 
 // ════════════════════════════════════════════
@@ -1306,8 +1330,16 @@ function addStudent(){
 }
 
 // ════════════════════════════════════════════
-// INIT
+// INIT — localStorage에서 불러오기
 // ════════════════════════════════════════════
+(function(){
+  const loaded = loadFromLocal();
+  // 레퍼런스 갱신
+  P.length=0; SAVE_DATA.projects.forEach(p=>P.push(p));
+  M.length=0; SAVE_DATA.months.forEach(m=>M.push(m));
+  W.length=0; SAVE_DATA.weekly.forEach(w=>W.push(w));
+  if(loaded) showToast('📂 저장된 데이터 불러옴');
+})();
 rebuildAll();
 updateProgress();
 </script>
