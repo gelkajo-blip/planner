@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
 <title>2026 혜정님 연간 플래너 v5</title>
 <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+KR:wght@400;700&family=Noto+Sans+KR:wght@300;400;500;700&display=swap" rel="stylesheet">
-<style>
+<style>A
 :root {
   --cream:#faf6f0; --white:#fff9f2; --brown:#4a3020; --brown2:#7a5c44; --brown3:#b8977e;
   --border:#e6d8c8; --ink:#2a1f1a; --ink2:#6b5040;
@@ -1329,16 +1329,23 @@ function addStudent(){
   markDirty();buildFinance();showToast('학생 추가됨 ✓');
 }
 
+
 // ════════════════════════════════════════════
 // INIT — localStorage에서 불러오기
 // ════════════════════════════════════════════
 (function(){
-  const loaded = loadFromLocal();
-  // 레퍼런스 갱신
-  P.length=0; SAVE_DATA.projects.forEach(p=>P.push(p));
-  M.length=0; SAVE_DATA.months.forEach(m=>M.push(m));
-  W.length=0; SAVE_DATA.weekly.forEach(w=>W.push(w));
-  if(loaded) showToast('📂 저장된 데이터 불러옴');
+  try {
+    const raw = localStorage.getItem(LS_KEY);
+    if(raw){
+      const saved = JSON.parse(raw);
+      if(saved.months)    { SAVE_DATA.months    = saved.months;    M.length=0; saved.months.forEach(m=>M.push(m)); }
+      if(saved.weekly)    { SAVE_DATA.weekly    = saved.weekly;    W.length=0; saved.weekly.forEach(w=>W.push(w)); }
+      if(saved.dailyLogs) { SAVE_DATA.dailyLogs = saved.dailyLogs; }
+      if(saved.finance)   { SAVE_DATA.finance   = saved.finance;   }
+      if(saved.projects)  { SAVE_DATA.projects  = saved.projects;  P.length=0; saved.projects.forEach(p=>P.push(p)); }
+      setTimeout(()=>showToast('📂 저장된 데이터 불러옴'),500);
+    }
+  } catch(e) { console.warn('로컬 저장 불러오기 실패', e); }
 })();
 rebuildAll();
 updateProgress();
